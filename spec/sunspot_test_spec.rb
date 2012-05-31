@@ -123,6 +123,20 @@ describe SunspotTest do
     end
 
     describe ".solr_running" do
+      context "pinging the solr server" do
+        it "defaults to /admin/ping" do
+          SunspotTest.ping_path.should == '/admin/ping'
+        end
+          
+        it "overrides the default ping uri" do
+          ping_url = URI.parse("#{Sunspot.session.config.solr.url}/foo/bar/baz")
+          SunspotTest.ping_path = '/foo/bar/baz'
+          Net::HTTP.should_receive(:get).with(ping_url).and_return(true)
+          SunspotTest.send(:solr_running?)
+        end
+
+      end
+
       context "if solr is running" do
         before(:each) { Net::HTTP.stub!(:get).and_return(true) }
 

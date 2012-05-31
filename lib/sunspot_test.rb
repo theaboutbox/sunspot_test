@@ -51,6 +51,19 @@ module SunspotTest
       end
     end
 
+    # Overrides the path (relative to the solr application root) that is used to check and see
+    # if solr is running
+    def ping_path=(path)
+      @ping_path = path
+    end
+
+    # Gets the path (relative to the solr application root) that is used to check and see if
+    # solr is running. The default path for solr is /admin/ping.
+    # (http://wiki.apache.org/solr/SolrConfigXml#The_Admin.2BAC8-GUI_Section)
+    def ping_path
+      @ping_path ||= '/admin/ping'
+    end
+
     private
 
     def original_sunspot_session
@@ -67,7 +80,7 @@ module SunspotTest
 
     def solr_running?
       begin
-        solr_ping_uri = URI.parse("#{Sunspot.session.config.solr.url}/ping")
+        solr_ping_uri = URI.parse("#{Sunspot.session.config.solr.url}#{ping_path}")
         Net::HTTP.get(solr_ping_uri)
         true # Solr Running
       rescue
